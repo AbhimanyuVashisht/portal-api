@@ -2,7 +2,9 @@
 
 // Include node packages
 const express = require('express');
+const logger = require('morgan');
 const bodyParser = require('body-parser');
+const fs = require('fs');
 
 const app = express();
 
@@ -23,9 +25,48 @@ app.use(bodyParser.urlencoded({
 // JSON body parser
 app.use(bodyParser.json());
 
+// Set Allowed Headers
+app.use(function (req, res, next) {
+   res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+   res.setHeader('Access-Control-Allow-Headers', 'X-Origin,X-Auth');
+   res.setHeader('Access-Control-Allow-Origin', ['*']);
+
+   next();
+});
+
 app.get('/ping', function (req, res) {
     res.send('pong');
 });
+
+// Configure logging
+logger.token('req-body', function (req, res) {
+    return JSON.stringify({
+        params: req.query,
+        body: req.body
+    });
+});
+
+logger.token('req-headers', function (req, res) {
+    return JSON.stringify(req.headers);
+});
+
+logger.token('tracking', function (req, res) {
+    return req.headers['x-device-id'] ? req.headers['x-device-id'] : 'DEFAULT';
+});
+
+logger.token('uri', function (req, res) {
+    return req.originalUrl.split('?')[0];
+});
+
+let customLogFormat = ':date[iso] :method :uri :status : response-time :tracking :req-headers :req-body';
+let accessLogStream = fs.createWriteStream(config.MORGAN_LOG_PATH + '/morgan.log', {
+    flags: 'a'
+});
+
+// logger middleware
+app.use(logger(customLogFormat, {
+    stream: accessLogStream
+}));
 
 // Configure middleware
 app.use(auths);
