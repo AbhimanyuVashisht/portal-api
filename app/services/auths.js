@@ -40,9 +40,10 @@ let login = function (params, cb) {
                     return doneCallback(err);
                 }
 
-                if(!result){
+                if(!result || result.length === 0){
                     return doneCallback(status.getStatus('authn_fail'));
                 }
+
                 return doneCallback(null, result[0]._id);
             });
         },

@@ -17,6 +17,7 @@ let auths = require('./app/middlewares/auths');
 
 // Include routers
 let authsRouter = require('./app/routes/auths');
+let tracksRouter = require('./app/routes/tracks');
 
 // URL Encoded body parser
 app.use(bodyParser.urlencoded({
@@ -73,6 +74,7 @@ app.use(auths);
 
 // Configure routes
 app.use('/auths', authsRouter);
+app.use('/tracks', tracksRouter);
 
 // Global error handler
 app.use(function (err, req, res, next) {
