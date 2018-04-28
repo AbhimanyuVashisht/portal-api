@@ -7,13 +7,15 @@ let status = require('../configs/status');
 
 let trackModel = require('../models/tracks');
 
+let secret = require('../secret');
+
 let config = {
-    apiKey: "AIzaSyAk8XjZ_NlOHlVEk2HQ9pIxBQzmd4IbsWw",
-    authDomain: "portal-3401.firebaseapp.com",
-    databaseURL: "https://portal-3401.firebaseio.com",
-    projectId: "portal-3401",
-    storageBucket: "portal-3401.appspot.com",
-    messagingSenderId: "983494927932"
+    apiKey: secret.FIREBASE_API,
+    authDomain: `${secret.AUTH_DOMAIN}.firebaseapp.com`,
+    databaseURL: `https://${secret.DATABASE_URL}.firebaseio.com`,
+    projectId: secret.PROJECT_ID,
+    storageBucket: `${secret.STORAGE_BUCKET}.appspot.com`,
+    messagingSenderId: secret.MESSAGING_SENDER_ID
 };
 
 let updateNotification = function (params, cb) {

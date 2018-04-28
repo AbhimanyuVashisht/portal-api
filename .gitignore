@@ -9,3 +9,6 @@ package-lock.json
 
 # logs
 app/logs
+
+# secret JSON
+app/secret.json
