@@ -3,9 +3,10 @@ let mongoose = require('mongoose');
 let scheduleSchema = new mongoose.Schema({
    trainId: Number,
    schedule: [{
-       stationId: String,
+       stationId: Number,
        arrivalTime: Date,
-       departureTime: Date
+       departureTime: Date,
+       distanceFromNextStation: Number
    }]
 });
 

@@ -17,9 +17,11 @@ let config = {
     storageBucket: `${secret.STORAGE_BUCKET}.appspot.com`,
     messagingSenderId: secret.MESSAGING_SENDER_ID
 };
+firebase.initializeApp(config);
+let database = firebase.database();
 
 let updateNotification = function (params, cb) {
-    if(!params.stationId || !params.trainId){
+    if(!params.stationId || !params.trainId || !params.distanceToNextStation || !params.speed){
         return cb(status.getStatus('input_missing'));
     }
 
@@ -30,11 +32,11 @@ let updateNotification = function (params, cb) {
                    return doneCallback(err);
                }
 
-               return doneCallback(null, result, params.stationId);
+               return doneCallback(null, result, params.stationId, params.distanceToNextStation, params.speed);
             });
         },
 
-        function (trainDetail, stationId, doneCallback) {
+        function (trainDetail, stationId, distanceToNextStation, speed, doneCallback) {
             let originDestinationIdParams = {
                 originId: trainDetail.originId,
                 destinationId: trainDetail.destinationId
@@ -53,16 +55,25 @@ let updateNotification = function (params, cb) {
                     destinationStation: result[1].destinationStation
                 };
 
-               doneCallback(null, updatedTrainDetail, stationId);
+               doneCallback(null, updatedTrainDetail, stationId, distanceToNextStation, speed);
             });
         },
 
-        function (trainDetail, stationId, doneCallback) {
-            firebase.initializeApp(config);
-
-            let database = firebase.database();
+        function (trainDetail, stationId, distanceToNextStation, speed, doneCallback) {
             database.ref('station/' + stationId).set(trainDetail)
-                .then(() => doneCallback(null))
+                .then(() => {
+                    let updateParams = {};
+                    updateParams.trainId = trainDetail.trainId;
+                    updateParams.stationId = stationId;
+                    updateParams.time = distanceToNextStation/speed;
+                    trackModel.updateTrainRunningStatus(updateParams, (err, result) => {
+                       if(err){
+                           return doneCallback(err);
+                       }
+
+                       return doneCallback(null);
+                    });
+                })
                 .catch((err) => doneCallback(err))
         },
 
@@ -78,11 +89,76 @@ let updateNotification = function (params, cb) {
 
         return cb(null, done);
     })
+};
 
+let trackTrainById = function(params, cb){
+    if(!params.trainId){
+        return cb(status.getStatus('input_missing'));
+    }
+
+    async.waterfall([
+        function (doneCallBack) {
+            trackModel.getScheduleByTrainId(params.trainId, (err, result) => {
+                if(err){
+                    return doneCallBack(err);
+                }
+
+                doneCallBack(null, result.schedule, params.trainId);
+            })
+        },
+
+        function (trainSchedule, trainId, doneCallback) {
+            async.mapSeries(trainSchedule, function (item, callback) {
+                trackModel.getStationById(item.stationId, (err, result) => {
+                    if(err){
+                        return callback(err);
+                    }
+                    let mergedResult = {};
+                    mergedResult.stationDetail = result;
+                    mergedResult.distanceFromNextStation = item.distanceFromNextStation;
+
+                    callback(null, mergedResult);
+                })
+            }, function (err, result) {
+                if(err){
+                    return doneCallback(err);
+                }
+
+                return doneCallback(null, result, trainId);
+            })
+        },
+
+        function (scheduleStationDetail, trainId, doneCallback) {
+            trackModel.getTrainRunningStatusByTrainId(trainId, (err, result) => {
+                if(err){
+                    return doneCallback(err);
+                }
+                return doneCallback(null, result, scheduleStationDetail, trainId);
+            })
+        },
+
+        function (runningStatus, scheduleTrain, trainId, doneCallback) {
+            let response = status.getStatus('success');
+            response.data = {};
+            response.data.runningStatus = runningStatus;
+            response.data.scheduleTrain = scheduleTrain;
+            response.data.trainId = trainId;
+
+            doneCallback(null, response);
+        }
+
+    ], function (err, done) {
+        if(err){
+            return cb(err);
+        }
+
+        return cb(null, done);
+    })
 
 };
 
 module.exports = {
-    updateNotification: updateNotification
+    updateNotification: updateNotification,
+    trackTrainById: trackTrainById
 };
 

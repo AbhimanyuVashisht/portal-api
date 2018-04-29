@@ -4,6 +4,8 @@ let status = require('../configs/status');
 
 let trainModel = require('../schema/train.model');
 let stationModel = require('../schema/station.model');
+let runningStatusModel = require('../schema/runningStatus');
+let scheduleModel = require('../schema/schedule.model');
 
 let getTrainById = function(trainId, cb){
     if(!trainId){
@@ -80,7 +82,72 @@ let getOriginDestinationStationById = function(params, cb){
     })
 };
 
+let updateTrainRunningStatus = function(params, cb){
+    if(!params.trainId || !params.stationId || !params.time){
+        return cb(status.getStatus('input_missing'));
+    }
+
+    runningStatusModel.findOneAndUpdate({trainId: params.trainId}, {$set: {stationId: params.stationId, time: params.time}}, (err, result) => {
+        if(err){
+            return cb(err);
+        }
+
+        if(!result || result.length === 0){
+            let trainRunning = new runningStatusModel({
+                trainId: params.trainId,
+                stationId: params.stationId,
+                time: params.time
+            });
+
+            trainRunning.save((err, result) => {
+               if(err){
+                   return cb(err);
+               }
+
+               return cb(null);
+            });
+        }
+
+        return cb(null);
+    })
+};
+
+let getScheduleByTrainId = function(trainId, cb){
+    if(!trainId){
+        return cb(status.getStatus('input_missing'));
+    }
+
+    scheduleModel.find({trainId: trainId}, (err, result) => {
+        if(err){
+            return cb(err);
+        }
+
+        if(!result || result.length === 0){
+            return cb(null, null);
+        }
+
+        return cb(null, result[0]);
+    })
+};
+
+let getTrainRunningStatusByTrainId = function(trainId, cb){
+    runningStatusModel.find({trainId: trainId}, (err, result) => {
+        if(err){
+            return cb(err);
+        }
+
+        if(!result || result.length === 0){
+            return cb(null, null);
+        }
+        return cb(null, result[0]);
+    })
+};
+
 module.exports = {
     getTrainById: getTrainById,
-    getOriginDestinationStationById: getOriginDestinationStationById
+    getOriginDestinationStationById: getOriginDestinationStationById,
+    updateTrainRunningStatus: updateTrainRunningStatus,
+    getScheduleByTrainId: getScheduleByTrainId,
+    getTrainRunningStatusByTrainId: getTrainRunningStatusByTrainId,
+    getStationById: getStationById
 };
