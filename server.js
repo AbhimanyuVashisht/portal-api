@@ -29,7 +29,7 @@ app.use(bodyParser.json());
 // Set Allowed Headers
 app.use(function (req, res, next) {
    res.setHeader('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-   res.setHeader('Access-Control-Allow-Headers', 'X-Origin,X-Auth');
+   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,Content-Type,Authorization,X-Origin,X-Auth');
    res.setHeader('Access-Control-Allow-Origin', ['*']);
 
    next();

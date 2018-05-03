@@ -82,6 +82,7 @@ let login = function (params, cb) {
                     id: userId,
                     name: result[0].displayName,
                     roleId: result[0].roleId,
+                    stationPosted: result[0].stationPosted
                 };
 
                 return doneCallback(null, userId, user, session);
