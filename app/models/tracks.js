@@ -96,7 +96,7 @@ let updateTrainRunningStatus = function(params, cb){
             let trainRunning = new runningStatusModel({
                 trainId: params.trainId,
                 stationId: params.stationId,
-                time: params.time
+                time: params.time,
             });
 
             trainRunning.save((err, result) => {
@@ -106,9 +106,9 @@ let updateTrainRunningStatus = function(params, cb){
 
                return cb(null);
             });
+        }else{
+            return cb(null);
         }
-
-        return cb(null);
     })
 };
 

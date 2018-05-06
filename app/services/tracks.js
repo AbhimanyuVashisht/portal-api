@@ -21,7 +21,8 @@ firebase.initializeApp(config);
 let database = firebase.database();
 
 let updateNotification = function (params, cb) {
-    if(!params.stationId || !params.trainId || !params.distanceToNextStation || !params.speed){
+    if(!params.stationId || !params.trainId || !params.distanceToNextStation || !params.speed || !params.waterLevel
+        || !params.fuelLevel || !params.specialMessage){
         return cb(status.getStatus('input_missing'));
     }
 
@@ -32,11 +33,11 @@ let updateNotification = function (params, cb) {
                    return doneCallback(err);
                }
 
-               return doneCallback(null, result, params.stationId, params.distanceToNextStation, params.speed);
+               return doneCallback(null, result, params.stationId, params);
             });
         },
 
-        function (trainDetail, stationId, distanceToNextStation, speed, doneCallback) {
+        function (trainDetail, stationId, params, doneCallback) {
             let originDestinationIdParams = {
                 originId: trainDetail.originId,
                 destinationId: trainDetail.destinationId
@@ -52,25 +53,28 @@ let updateNotification = function (params, cb) {
                     trainName: trainDetail.trainName,
                     type: trainDetail.type,
                     originStation: result[0].originStation,
-                    destinationStation: result[1].destinationStation
+                    destinationStation: result[1].destinationStation,
+                    time: params.distanceToNextStation/params.speed,
+                    waterLevel: params.waterLevel,
+                    fuelLevel: params.fuelLevel,
+                    specialMessage: params.specialMessage
                 };
 
-               doneCallback(null, updatedTrainDetail, stationId, distanceToNextStation, speed);
+               doneCallback(null, updatedTrainDetail, stationId, params);
             });
         },
 
-        function (trainDetail, stationId, distanceToNextStation, speed, doneCallback) {
+        function (trainDetail, stationId, params, doneCallback) {
             database.ref('station/' + stationId).set(trainDetail)
                 .then(() => {
                     let updateParams = {};
                     updateParams.trainId = trainDetail.trainId;
                     updateParams.stationId = stationId;
-                    updateParams.time = distanceToNextStation/speed;
+                    updateParams.time = params.distanceToNextStation/params.speed;
                     trackModel.updateTrainRunningStatus(updateParams, (err, result) => {
                        if(err){
                            return doneCallback(err);
                        }
-
                        return doneCallback(null);
                     });
                 })
