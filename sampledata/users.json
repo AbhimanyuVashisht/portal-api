@@ -1,0 +1,5 @@
+{"_id":{"$oid":"5ae4aa7dd30a876fc45807f7"},"roleId":1,"displayName":"Abhimanyu Vashisht","email":"abhimanyu.vashisht@gmail.com","phone":9.999626755e+09,"stationPosted":0,"password":"5f4dcc3b5aa765d61d8327deb882cf99","__v":0}
+{"_id":{"$oid":"5ae4aad750cf526fe8e549c4"},"roleId":2,"displayName":"Station Master1","email":"stationmaster1@rail.gov.in","phone":9.999999999e+09,"stationPosted":1,"password":"5f4dcc3b5aa765d61d8327deb882cf99","__v":0}
+{"_id":{"$oid":"5ae4aaebc9f811700031d7a3"},"roleId":2,"displayName":"Station Master2","email":"stationmaster2@rail.gov.in","phone":8.888888888e+09,"stationPosted":2,"password":"5f4dcc3b5aa765d61d8327deb882cf99","__v":0}
+{"_id":{"$oid":"5ae4aafda3d9de700f953560"},"roleId":2,"displayName":"Station Master3","email":"stationmaster3@rail.gov.in","phone":7.777777777e+09,"stationPosted":3,"password":"5f4dcc3b5aa765d61d8327deb882cf99","__v":0}
+{"_id":{"$oid":"5ae4ab0c79b770701d9c0798"},"roleId":2,"displayName":"Station Master4","email":"stationmaster4@rail.gov.in","phone":6.666666666e+09,"stationPosted":4,"password":"5f4dcc3b5aa765d61d8327deb882cf99","__v":0}

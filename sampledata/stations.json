@@ -1,0 +1,4 @@
+{"_id":{"$oid":"5ae4b5faa8b86578f22585c8"},"stationId":1,"stationName":"Delhi","__v":0}
+{"_id":{"$oid":"5ae4b60688d645790377ba97"},"stationId":2,"stationName":"Sonipat","__v":0}
+{"_id":{"$oid":"5ae4b60f9f8bd479113c9396"},"stationId":3,"stationName":"Karnal","__v":0}
+{"_id":{"$oid":"5ae4b61a3492b0791ee7cf8d"},"stationId":4,"stationName":"Ambala","__v":0}
